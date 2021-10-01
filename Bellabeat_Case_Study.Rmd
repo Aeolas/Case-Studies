@@ -1,0 +1,169 @@
+---
+title: 'Case Study: How Can a Wellness Technology Company Play It Smart?'
+author: "Saulius Macys"
+date: "11/09/2021"
+output:
+  html_document: default
+  pdf_document: default
+---
+
+### About the company
+
+Urška Sršen and Sando Mur founded Bellabeat, a high-tech company that manufactures health-focused smart products. Sršen used her background as an artist to develop beautifully designed technology that informs and inspires women around the world. Collecting data on activity, sleep, stress, and reproductive health has allowed Bellabeat to empower women with knowledge about their own health and habits. Since it was founded in 2013, Bellabeat has grown rapidly and quickly positioned itself as a tech-driven wellness company for women.
+
+## Phase 1: Ask
+
+### Business Task
+Analyze [Fitbit's](https://www.kaggle.com/arashnic/fitbit) smart device data to gain insights(trends) into how consumers are using their smart devices and present high-level recommendations for Bellabeat’s marketing strategy.
+
+### Key Stakeholders
+* Urška Sršen: Bellabeat’s cofounder and Chief Creative Officer
+* Sando Mur: Mathematician and Bellabeat’s cofounder
+* Bellabeat marketing analytics team
+
+## Phase 2: Prepare
+
+### Installing packages which I will need to use
+```{r}
+install.packages('tidyverse')
+install.packages('lubridate')
+install.packages('skimr')
+install.packages('janitor')
+install.packages('ggplot2')
+install.packages('readr')
+```
+### Loading libraries of installed packages
+```{r}
+library(tidyverse)
+library(lubridate)
+library(skimr)
+library(janitor)
+library(ggplot2)
+library(readr)
+```
+
+## Importing my CSV files
+```{r}
+DailyActivity<- read_csv("dailyActivity_merged.csv")
+SleepDay<- read_csv("sleepDay_merged.csv")
+WeightLogInfo<- read_csv("weightLogInfo_merged.csv")
+```
+I chose to import DailyActivity dataset since it already has merged data for Daily Calories, Intensities and Steps. I added Sleep and Weight Log datasets as well.
+
+## Phase 3 and 4: Process and Analyze
+
+## Exploring a few key tables
+
+```{r}
+head(DailyActivity)
+head(SleepDay)
+head(WeightLogInfo)
+```
+
+Identifying all the columns:
+```{r}
+colnames(DailyActivity)
+colnames(SleepDay)
+colnames(WeightLogInfo)
+```
+
+
+## Understanding some summary statistics
+How many unique participants are there in each dataframe?
+
+```{r distinct users}
+n_distinct(DailyActivity$Id)
+n_distinct(SleepDay$Id)
+n_distinct(WeightLogInfo$Id)
+```
+Daily Activity dataset has the most participants (33), while Sleep dataframe and Weight dataframe have much less. This could be attributed to smartware devices not being charged at night and participants not measuring their weight as often as other data.
+
+
+How many observations are there in each dataframe?
+```{r observations}
+nrow(DailyActivity)
+nrow(SleepDay)
+nrow(WeightLogInfo)
+```
+
+### Some quick summary statistics about each data frame:
+
+
+For the daily activity dataframe I would like to analyze corelation between Steps, Distance and calories:
+```{r}
+DailyActivity %>%  
+  select(TotalSteps,
+         TotalDistance,
+         Calories) %>%
+  summary()
+```
+
+
+
+For the Sleep dataframe I will compare total minutes asleep with total minutes in bed:
+```{r}
+SleepDay %>%  
+  select(TotalMinutesAsleep,
+         TotalTimeInBed) %>%
+  summary()
+```
+
+
+For the Weight dataframe I will compare weight and BMI relationship:
+```{r}
+WeightLogInfo %>%  
+  select(BMI,
+         WeightKg) %>%
+  summary()
+```
+
+
+## Phase 5: Share
+
+### Plotting a few explorations
+
+On the following 3 plots showing a clear tendency between Total Steps, Total Distance and Calories used.
+The observation is that higher activity leads to more steps completed and more calories burnt.
+```{r}
+ggplot(data=DailyActivity, aes(x=TotalSteps, y=TotalDistance)) + 
+  geom_point() +
+  geom_smooth()
+```
+```{r}
+ggplot(data=DailyActivity, aes(x=TotalSteps, y=Calories)) + 
+   geom_point() +
+  geom_smooth()
+```
+
+```{r}
+ggplot(data=DailyActivity, aes(x=TotalDistance, y=Calories)) + 
+   geom_point() +
+  geom_smooth()
+```
+
+
+
+The following Sleep plot clearly shows that total minutes asleep are directly proportional to total time spent in bed.
+
+```{r}
+ggplot(data=SleepDay, aes(x=TotalMinutesAsleep, y=TotalTimeInBed)) + 
+   geom_point() +
+  geom_smooth()
+```
+
+
+The following plot shows that BMI is very related to total weight and the higher weight it is - the more likely that BMI will be higher as well.
+```{r}
+ggplot(data=WeightLogInfo, aes(x=WeightKg, y=BMI)) + 
+   geom_point() +
+  geom_smooth()
+```
+
+
+## Phase 6: Act
+
+Based on my analysis I found that users of smart devices are mainly using them for day-to-day activities like steps completed, distance walked and calories burnt. These functions are a must in current market for releasing new smart devices for Bellabeat.
+
+Sleeping data can be very valuable as well but it requires a device which would have a significant battery capacity to ensure that accurate data could be gathered throughout the night.
+
+Weight measurement option is not being used that much in smart devices at the moment, because information needs to be added manually or synced with a digital scale and for this reason I would recommend to exclude it in order to invest resources in other aspects which are more in demand by customers.
